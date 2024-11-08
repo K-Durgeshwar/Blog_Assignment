@@ -2,11 +2,10 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import BlogCard from '../components/BlogCard';
 import Navbar from '../components/Navbar';
-import { useRouter } from 'next/router';
+import Link from 'next/link';  // Import next/link for routing
 
 const Home = () => {
   const [blogs, setBlogs] = useState([]);
-  const router = useRouter();
 
   useEffect(() => {
     const fetchBlogs = async () => {
@@ -29,19 +28,17 @@ const Home = () => {
     <div>
       <Navbar />
       <div className="container mx-auto py-6">
-        <button 
-          className="bg-blue-500 text-white px-4 py-2 mb-4 rounded" 
-          onClick={() => router.push('/create')}
-        >
-          Create New Blog
-        </button>
+        <Link href="/create">
+          <a className="bg-blue-500 text-white px-4 py-2 mb-4 rounded">
+            Create New Blog
+          </a>
+        </Link>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {blogs.map((blog) => (
             <BlogCard 
               key={blog.id} 
               blog={blog}
               onDelete={handleDelete}
-              onEdit={() => router.push(`/create?id=${blog.id}`)}
             />
           ))}
         </div>
