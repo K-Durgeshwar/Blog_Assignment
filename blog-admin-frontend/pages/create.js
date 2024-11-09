@@ -18,11 +18,11 @@ const BlogEditor = ({ id }) => {
     if (id) {
       setIsEditMode(true);
       setBlogId(id);
-      
+
       const fetchBlog = async () => {
         try {
           const response = await axios.get(`http://localhost:5000/api/blogs/${id}`);
-          const blog = response.data[0];
+          const blog = response.data[0]; // Adjust based on your backend response
           setTitle(blog.title);
           setContent(blog.content);
           setImageUrl(blog.image_url);
@@ -50,7 +50,7 @@ const BlogEditor = ({ id }) => {
       tags,
       status,
     };
-  
+
     try {
       if (isEditMode) {
         if (!blogId) {
@@ -172,15 +172,6 @@ const BlogEditor = ({ id }) => {
       </Link>
     </div>
   );
-};
-
-export const getServerSideProps = async (context) => {
-  const { id } = context.query;
-  return {
-    props: {
-      id: id || null,
-    },
-  };
 };
 
 export default BlogEditor;
