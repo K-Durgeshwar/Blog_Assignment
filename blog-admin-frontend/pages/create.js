@@ -21,7 +21,7 @@ const BlogEditor = ({ id }) => {
 
       const fetchBlog = async () => {
         try {
-          const response = await axios.get(`http://localhost:5000/api/blogs/${id}`);
+          const response = await axios.get(`https://blog-assignment-roy2.onrender.com/api/blogs/${id}`);
           const blog = response.data[0]; // Adjust based on your backend response
           setTitle(blog.title);
           setContent(blog.content);
@@ -57,9 +57,9 @@ const BlogEditor = ({ id }) => {
           console.error("Blog ID is missing. Cannot update.");
           return;
         }
-        await axios.put(`http://localhost:5000/api/blogs/${blogId}`, blogData);
+        await axios.put(`https://blog-assignment-roy2.onrender.com/api/blogs/${blogId}`, blogData);
       } else {
-        await axios.post('http://localhost:5000/api/blogs', blogData);
+        await axios.post('https://blog-assignment-roy2.onrender.com/api/blogs', blogData);
       }
       window.location.href = '/'; 
     } catch (error) {

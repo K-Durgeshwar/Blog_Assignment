@@ -13,7 +13,7 @@ const BlogDetail = () => {
       if (!id) return;  // If id is not available, don't proceed further
 
       try {
-        const response = await axios.get(`http://localhost:5000/api/blogs/${id}`);
+        const response = await axios.get(`https://blog-assignment-roy2.onrender.com/api/blogs/${id}`);
         // Check the response
         if (response.data) {
           setBlog(response.data);  // Update the state with the fetched blog data

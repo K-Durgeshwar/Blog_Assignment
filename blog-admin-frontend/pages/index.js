@@ -9,7 +9,7 @@ const Home = () => {
 
   useEffect(() => {
     const fetchBlogs = async () => {
-      const response = await axios.get('http://localhost:5000/api/blogs');
+      const response = await axios.get('https://blog-assignment-roy2.onrender.com/api/blogs');
       setBlogs(response.data);
     };
     fetchBlogs();
@@ -17,7 +17,7 @@ const Home = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/blogs/${id}`);
+      await axios.delete(`https://blog-assignment-roy2.onrender.com/api/blogs/${id}`);
       setBlogs(blogs.filter(blog => blog.id !== id));
     } catch (error) {
       console.error("Error deleting blog:", error);
