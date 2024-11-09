@@ -1,19 +1,14 @@
-const mysql = require('mysql2');
-require('dotenv').config();
+const { Client } = require('pg');
 
-const connection = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME
+const client = new Client({
+  connectionString: 'postgresql://blog_db_it6l_user:QpT4iMS5zQFgwvSWlHze94JZpr2A4poS@dpg-csnkgpggph6c73bg5fhg-a.singapore-postgres.render.com/blog_db_it6l',
+  ssl: {
+    rejectUnauthorized: false  // Disable certificate validation for development, but keep SSL enabled
+  }
 });
 
-connection.connect((err) => {
-    if (err) {
-        console.error('Error connecting to the database:', err.stack);
-        return;
-    }
-    console.log('Connected to the database.');
-});
+client.connect()
+  .then(() => console.log("Connected to the database"))
+  .catch(err => console.error("Connection error", err.stack));
 
-module.exports = connection;
+module.exports = client;
