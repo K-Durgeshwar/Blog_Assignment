@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import BlogCard from '../components/BlogCard';
 import Navbar from '../components/Navbar';
-import Link from 'next/link';  // Import next/link for routing
+import Link from 'next/link';  
 
 const Home = () => {
   const [blogs, setBlogs] = useState([]);
@@ -28,10 +28,8 @@ const Home = () => {
     <div>
       <Navbar />
       <div className="container mx-auto py-6">
-        <Link href="/create">
-          <a className="bg-blue-500 text-white px-4 py-2 mb-4 rounded">
-            Create New Blog
-          </a>
+        <Link href="/create" className="bg-blue-500 text-white px-4 py-2 mb-4 rounded">
+          Create New Blog
         </Link>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {blogs.map((blog) => (

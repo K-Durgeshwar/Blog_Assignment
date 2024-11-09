@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useRouter } from 'next/router';
+import Link from 'next/link';
 
-const CreateOrEditBlog = () => {
+const BlogEditor = ({ id }) => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [imageUrl, setImageUrl] = useState('');
@@ -11,31 +11,35 @@ const CreateOrEditBlog = () => {
   const [metaDescription, setMetaDescription] = useState('');
   const [tags, setTags] = useState('');
   const [status, setStatus] = useState('draft');
-  const [isEdit, setIsEdit] = useState(false);
-  const router = useRouter();
-  const { id } = router.query;
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [blogId, setBlogId] = useState(null);
 
   useEffect(() => {
     if (id) {
-      setIsEdit(true);
-      axios.get(`http://localhost:5000/api/blogs/${id}`)
-        .then(response => {
-          const blog = response.data;
+      setIsEditMode(true);
+      setBlogId(id);
+      
+      const fetchBlog = async () => {
+        try {
+          const response = await axios.get(`http://localhost:5000/api/blogs/${id}`);
+          const blog = response.data[0];
           setTitle(blog.title);
           setContent(blog.content);
           setImageUrl(blog.image_url);
           setVideoUrl(blog.video_url);
           setMetaTitle(blog.meta_title);
           setMetaDescription(blog.meta_description);
-          setTags(Array.isArray(blog.tags) ? blog.tags.join(', ') : ''); // Check if tags is an array
+          setTags(blog.tags);
           setStatus(blog.status);
-        })
-        .catch(error => console.error('Error fetching blog:', error));
+        } catch (error) {
+          console.error("Error fetching blog:", error);
+        }
+      };
+      fetchBlog();
     }
   }, [id]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSave = async () => {
     const blogData = {
       title,
       content,
@@ -43,83 +47,140 @@ const CreateOrEditBlog = () => {
       video_url: videoUrl,
       meta_title: metaTitle,
       meta_description: metaDescription,
-      tags: tags.split(',').map(tag => tag.trim()), // Convert comma-separated tags to array
-      status
+      tags,
+      status,
     };
+  
     try {
-      if (isEdit) {
-        await axios.put(`http://localhost:5000/api/blogs/${id}`, blogData);
+      if (isEditMode) {
+        if (!blogId) {
+          console.error("Blog ID is missing. Cannot update.");
+          return;
+        }
+        await axios.put(`http://localhost:5000/api/blogs/${blogId}`, blogData);
       } else {
         await axios.post('http://localhost:5000/api/blogs', blogData);
       }
-      router.push('/');
+      window.location.href = '/'; 
     } catch (error) {
-      console.error('Error saving blog:', error);
+      console.error("Error saving blog:", error);
     }
   };
 
   return (
     <div className="container mx-auto py-6">
-      <h1 className="text-2xl font-bold mb-4">{isEdit ? 'Edit Blog' : 'Create Blog'}</h1>
-      <form onSubmit={handleSubmit}>
-        <input 
-          className="border p-2 mb-4 w-full" 
-          placeholder="Title" 
-          value={title} 
-          onChange={(e) => setTitle(e.target.value)} 
+      <h1 className="text-3xl font-bold mb-4">{isEditMode ? 'Edit Blog' : 'Create New Blog'}</h1>
+      
+      <div className="mb-4">
+        <label className="block text-gray-700">Title</label>
+        <input
+          type="text"
+          className="w-full p-2 border border-gray-300 rounded"
+          placeholder="Enter title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
         />
-        <input 
-          className="border p-2 mb-4 w-full" 
-          placeholder="Meta Title" 
-          value={metaTitle} 
-          onChange={(e) => setMetaTitle(e.target.value)} 
-        />
-        <textarea 
-          className="border p-2 mb-4 w-full" 
-          placeholder="Meta Description" 
-          rows="2"
-          value={metaDescription} 
-          onChange={(e) => setMetaDescription(e.target.value)}
-        />
-        <textarea 
-          className="border p-2 mb-4 w-full" 
-          placeholder="Content" 
-          rows="10"
-          value={content} 
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-gray-700">Content</label>
+        <textarea
+          className="w-full p-2 border border-gray-300 rounded"
+          placeholder="Enter content"
+          value={content}
           onChange={(e) => setContent(e.target.value)}
         />
-        <input 
-          className="border p-2 mb-4 w-full" 
-          placeholder="Image URL" 
-          value={imageUrl} 
-          onChange={(e) => setImageUrl(e.target.value)} 
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-gray-700">Image URL</label>
+        <input
+          type="text"
+          className="w-full p-2 border border-gray-300 rounded"
+          placeholder="Enter image URL"
+          value={imageUrl}
+          onChange={(e) => setImageUrl(e.target.value)}
         />
-        <input 
-          className="border p-2 mb-4 w-full" 
-          placeholder="Video URL" 
-          value={videoUrl} 
-          onChange={(e) => setVideoUrl(e.target.value)} 
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-gray-700">Video URL</label>
+        <input
+          type="text"
+          className="w-full p-2 border border-gray-300 rounded"
+          placeholder="Enter video URL"
+          value={videoUrl}
+          onChange={(e) => setVideoUrl(e.target.value)}
         />
-        <input 
-          className="border p-2 mb-4 w-full" 
-          placeholder="Tags (comma-separated)" 
-          value={tags} 
-          onChange={(e) => setTags(e.target.value)} 
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-gray-700">Meta Title</label>
+        <input
+          type="text"
+          className="w-full p-2 border border-gray-300 rounded"
+          placeholder="Enter meta title"
+          value={metaTitle}
+          onChange={(e) => setMetaTitle(e.target.value)}
         />
-        <select 
-          className="border p-2 mb-4 w-full" 
-          value={status} 
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-gray-700">Meta Description</label>
+        <textarea
+          className="w-full p-2 border border-gray-300 rounded"
+          placeholder="Enter meta description"
+          value={metaDescription}
+          onChange={(e) => setMetaDescription(e.target.value)}
+        />
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-gray-700">Tags</label>
+        <input
+          type="text"
+          className="w-full p-2 border border-gray-300 rounded"
+          placeholder="Enter tags"
+          value={tags}
+          onChange={(e) => setTags(e.target.value)}
+        />
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-gray-700">Status</label>
+        <select
+          className="w-full p-2 border border-gray-300 rounded"
+          value={status}
           onChange={(e) => setStatus(e.target.value)}
         >
           <option value="draft">Draft</option>
           <option value="published">Published</option>
         </select>
-        <button className="bg-blue-500 text-white px-4 py-2 rounded">
-          {isEdit ? 'Update Blog' : 'Create Blog'}
+      </div>
+
+      <button
+        className="bg-blue-500 text-white px-4 py-2 rounded"
+        onClick={handleSave}
+      >
+        {isEditMode ? 'Update Blog' : 'Create Blog'}
+      </button>
+
+      <Link href="/" passHref>
+        <button className="bg-gray-500 text-white px-4 py-2 rounded ml-2">
+          Cancel
         </button>
-      </form>
+      </Link>
     </div>
   );
 };
 
-export default CreateOrEditBlog;
+export const getServerSideProps = async (context) => {
+  const { id } = context.query;
+  return {
+    props: {
+      id: id || null,
+    },
+  };
+};
+
+export default BlogEditor;
